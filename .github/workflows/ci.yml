@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  shell:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck and bats
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then sudo apt-get update -q && sudo apt-get install -yq shellcheck bats
+          else brew install shellcheck bats-core; fi
+      - run: shellcheck bin/*.sh
+      - run: bats tests/bats
+
+  python:
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e . pytest==8.4.2 ruff==0.17.2
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: pytest -v
+      - name: Entry points installed
+        run: healthcheck --help && azure-cost-report --help

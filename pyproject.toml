@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devops-toolkit"
+version = "0.1.0"
+description = "Small, tested ops utilities"
+requires-python = ">=3.9"
+
+[project.scripts]
+healthcheck = "devops_toolkit.healthcheck:main"
+azure-cost-report = "devops_toolkit.azure_cost_report:main"
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.pytest.ini_options]
+pythonpath = ["python"]
+testpaths = ["tests/python"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+src = ["python", "tests/python"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "S", "UP"]
+ignore = ["UP006", "UP035", "UP045"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
